@@ -29,6 +29,11 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Create www folder and move index.html
+        run: |
+          mkdir -p www
+          cp index.html www/
+
       - name: Initialize Capacitor Android
         run: npx --yes @capacitor/cli add android
 
