@@ -27,16 +27,13 @@ jobs:
           java-version: '17'
 
       - name: Install Dependencies
-        run: |
-          npm install
+        run: npm install
 
       - name: Initialize Capacitor Android
-        run: |
-          npx cap add android
+        run: npx cap add android
 
       - name: Sync Web Assets
-        run: |
-          npx cap sync android
+        run: npx cap sync android
 
       - name: Build APK with Gradle
         run: |
