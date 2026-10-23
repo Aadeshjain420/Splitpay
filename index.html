@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splitpay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .custom-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #9ca3af;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            background-color: #ffffff;
+            position: relative;
+        }
+        .custom-checkbox:checked::after {
+            content: '✔';
+            color: #16a34a;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-white text-black min-h-screen flex flex-col antialiased relative">
+    <!-- TOP BAR (HEADER) -->
+    <header class="w-full border-b border-gray-300 p-4 flex justify-between items-center bg-white sticky top-0 z-20">
+        <div onclick="showTab('generateTab')" class="flex items-center space-x-3 cursor-pointer group">
+            <div class="w-10 h-10 bg-gray-100 border border-gray-300 rounded-xl flex items-center justify-center shadow-sm group-hover:opacity-90 transition">
+                <span class="text-black font-extrabold text-lg">₹</span>
+            </div>
+            <div>
+                <h1 id="navShopName" class="text-base font-extrabold text-black truncate max-w-[200px] group-hover:underline">Splitpay</h1>
+            </div>
+        </div>
+        <div class="relative">
+            <button onclick="toggleMenu()" class="p-2 rounded-lg hover:bg-gray-200 transition border border-gray-300 flex items-center justify-center">
+                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-xl shadow-lg py-2 z-30">
+                <button onclick="showTab('generateTab'); toggleMenu();" class="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-bold text-black hover:bg-gray-100 transition">
+                    <svg class="w-5 h-5 text-gray-800" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 11-1.06 1.06l-.92-.92V19.5a1.5 1.5 0 01-1.5 1.5h-3.75a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-2.5a.75.75 0 00-.75.75v4.5a.75.75 0 01-.75.75H4.5A1.5 1.5 0 013 19.5v-6.83l-.92.92a.75.75 0 01-1.06-1.06l8.69-8.69z"/>
+                    </svg>
+                    <span>Home</span>
+                </button>
+                <button onclick="showTab('shopProfileTab'); toggleMenu();" class="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-bold text-black hover:bg-gray-100 transition border-t border-gray-100">
+                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    <span>Shop Profile</span>
+                </button>
+                <button onclick="showTab('historyTab'); toggleMenu();" class="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-bold text-black hover:bg-gray-100 transition border-t border-gray-100">
+                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>History</span>
+                </button>
+                <button onclick="showTab('settingsTab'); toggleMenu();" class="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-bold text-black hover:bg-gray-100 transition border-t border-gray-100">
+                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span>Settings</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-8 max-w-5xl mx-auto w-full bg-white pb-20 relative">
+        <!-- 1. GENERATE TAB -->
+        <section id="generateTab" class="tab-content space-y-6">
+            <div class="bg-white rounded-xl border border-gray-300 shadow-sm p-6 space-y-5">
+                <div class="border-b border-gray-300 pb-4">
+                    <h2 class="text-lg font-extrabold text-black">New Payment</h2>
+                </div>
+                <div class="bg-gray-50 border border-gray-300 rounded-xl p-4 space-y-3">
+                    <div id="simpleCalcSection" class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <input type="number" step="any" id="calcAmountInput" placeholder="Enter Amount to add (₹)" class="sm:col-span-10 px-3.5 py-2 border border-gray-400 rounded-lg text-sm text-black font-bold bg-white outline-none">
+                            <button onclick="addSimpleAmount()" class="sm:col-span-2 px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition">Add (+)</button>
+                        </div>
+                    </div>
+                    <div id="addedAmountsContainer" class="hidden divide-y divide-gray-200 border border-gray-300 rounded-lg bg-white max-h-40 overflow-y-auto"></div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-xs font-bold text-black uppercase tracking-wider mb-2">Total Amount (₹)</label>
+                        <div class="relative flex items-center">
+                            <span class="absolute left-3.5 text-black font-extrabold text-lg">₹</span>
+                            <input type="number" step="any" id="inputAmount" oninput="calculateRemaining()" placeholder="0.00" class="w-full pl-9 pr-20 py-2.5 border border-gray-400 rounded-lg focus:ring-2 focus:ring-gray-700 text-black font-bold outline-none placeholder-gray-500">
+                            <button onclick="clearTotalAmount()" class="absolute right-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition cursor-pointer">Clear</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-black uppercase tracking-wider mb-2">Cash Paid (₹)</label>
+                        <div class="relative flex items-center">
+                            <span class="absolute left-3.5 text-black font-extrabold text-lg">₹</span>
+                            <input type="number" step="any" id="inputCashPaid" oninput="calculateRemaining()" placeholder="0.00" class="w-full pl-9 pr-20 py-2.5 border border-gray-400 rounded-lg focus:ring-2 focus:ring-gray-700 text-black font-bold outline-none placeholder-gray-500">
+                            <button onclick="clearCashPaid()" class="absolute right-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition cursor-pointer">Clear</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-100 border border-gray-300 rounded-xl flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-bold uppercase text-black">Remaining Online/UPI Amount:</span>
+                        <div id="displayRemainingAmount" class="text-xl font-extrabold text-black">₹0.00</div>
+                    </div>
+                    <div id="cashOnlyNotice" class="hidden text-xs font-extrabold text-black bg-gray-200 px-3 py-1.5 rounded-lg border border-gray-400">
+                        Paid fully in Cash! No QR needed.
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button onclick="generateQRs()" class="w-full py-3.5 bg-gray-700 hover:bg-gray-800 text-white font-bold rounded-xl shadow transition flex items-center justify-center space-x-2">
+                        <span>Generate QR Codes</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. SHOP PROFILE TAB -->
+        <section id="shopProfileTab" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-xl border border-gray-300 shadow-sm p-6 relative">
+                <div class="border-b border-gray-300 pb-3 mb-4">
+                    <h2 class="text-base font-extrabold text-black">Shop Profile</h2>
+                </div>
+                <div class="max-w-md space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-black uppercase mb-1">Shop Name</label>
+                        <input type="text" id="settingShopName" class="w-full px-3.5 py-2 border border-gray-400 rounded-lg text-sm text-black font-bold outline-none focus:ring-2 focus:ring-gray-700">
+                    </div>
+                    <button onclick="saveShopName()" class="px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition">Save Profile</button>
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button onclick="showTab('generateTab')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-black text-xs font-extrabold rounded-lg transition flex items-center space-x-1">
+                        <span>Back</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. HISTORY TAB -->
+        <section id="historyTab" class="tab-content hidden space-y-6">
+            <div id="historyListView" class="bg-white rounded-xl border border-gray-300 shadow-sm p-6 relative">
+                <div class="border-b border-gray-300 pb-4 mb-4">
+                    <h2 class="text-lg font-extrabold text-black">Transaction History</h2>
+                </div>
+                <div id="historyItems" class="divide-y divide-gray-200"></div>
+                <div class="flex justify-end mt-6">
+                    <button onclick="showTab('generateTab')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-black text-xs font-extrabold rounded-lg transition flex items-center space-x-1">
+                        <span>Back</span>
+                    </button>
+                </div>
+            </div>
+            <div id="historyDetailView" class="hidden bg-white rounded-xl border border-gray-300 shadow-sm p-6 space-y-5 relative">
+                <div class="flex justify-between items-center border-b border-gray-300 pb-4">
+                    <h2 class="text-lg font-extrabold text-black">Transaction Details</h2>
+                    <button id="btnDeleteDetail" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition">Delete Record</button>
+                </div>
+                <div id="historyDetailContent"></div>
+                <div class="flex justify-end mt-6">
+                    <button onclick="closeHistoryDetail()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-black text-xs font-extrabold rounded-lg transition flex items-center space-x-1">
+                        <span>Back</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. SETTINGS TAB -->
+        <section id="settingsTab" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-xl border border-gray-300 shadow-sm p-6 space-y-6 relative">
+                <div class="border-b border-gray-300 pb-3">
+                    <h2 class="text-base font-extrabold text-black">Manage UPI Accounts</h2>
+                </div>
+                <div>
+                    <ul id="upiList" class="border border-gray-300 rounded-lg bg-white overflow-hidden divide-y divide-gray-200"></ul>
+                </div>
+                <div class="pt-2 border-t border-gray-200">
+                    <button onclick="toggleUpiModal(true)" class="w-full py-3.5 bg-gray-700 hover:bg-gray-800 text-white font-bold rounded-xl shadow transition flex items-center justify-center space-x-2">
+                        <span class="text-sm">Add New Account</span>
+                    </button>
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button onclick="showTab('generateTab')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-black text-xs font-extrabold rounded-lg transition flex items-center space-x-1">
+                        <span>Back</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- QR Swipe Modal -->
+    <div id="qrModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border border-gray-300 shadow-2xl max-w-md w-full p-6 space-y-4 relative flex flex-col max-h-[90vh] overflow-y-auto">
+            <div id="qrSwipeContainer" class="relative overflow-hidden touch-pan-y" 
+                 ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)">
+                <div id="qrModalCardContent" class="flex flex-col space-y-4 py-2"></div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-gray-200">
+                <button onclick="prevQrSlide()" id="prevQrBtn" class="px-3.5 py-2 bg-gray-200 hover:bg-gray-300 text-black text-xs font-bold rounded-lg transition disabled:opacity-40">← Prev</button>
+                <span id="qrDotIndicator" class="text-xs font-bold text-black">1 / 1</span>
+                <button onclick="nextQrSlide()" id="nextQrBtn" class="px-3.5 py-2 bg-gray-200 hover:bg-gray-300 text-black text-xs font-bold rounded-lg transition disabled:opacity-40">Next →</button>
+            </div>
+            <div class="pt-2">
+                <button onclick="completePaymentFromModal()" class="w-full py-3.5 bg-gray-700 hover:bg-gray-800 text-white font-bold rounded-xl shadow transition">Complete & Save Transaction</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Adding/Editing UPI Account -->
+    <div id="addUpiModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-gray-300 shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-200 pb-3">
+                <h3 id="modalTitle" class="text-base font-extrabold text-black">Add New UPI Account</h3>
+                <button onclick="toggleUpiModal(false)" class="text-black font-bold text-xl">&times;</button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-black mb-1">Account Nickname</label>
+                    <input type="text" id="newUpiName" placeholder="e.g. Counter 1" class="w-full px-3 py-2 bg-white border border-gray-400 rounded-lg text-sm font-bold text-black outline-none placeholder-gray-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-black mb-1">UPI ID</label>
+                    <input type="text" id="newUpiId" placeholder="merchant@upi" class="w-full px-3 py-2 bg-white border border-gray-400 rounded-lg text-sm font-bold text-black outline-none placeholder-gray-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-black mb-1">Bank Name <span class="font-normal capitalize">(Optional)</span></label>
+                    <input type="text" id="newBankName" placeholder="e.g. HDFC Bank" class="w-full px-3 py-2 bg-white border border-gray-400 rounded-lg text-sm font-bold text-black outline-none placeholder-gray-500">
+                </div>
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="toggleUpiModal(false)" class="flex-1 py-2.5 bg-gray-200 hover:bg-gray-300 text-black text-xs font-bold rounded-lg transition">Cancel</button>
+                <button id="modalSubmitBtn" onclick="saveUpiAccount()" class="flex-1 py-2.5 bg-gray-700 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition">Save Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Deleting Primary Account -->
+    <div id="confirmDeleteModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-gray-300 shadow-xl max-w-sm w-full p-6 space-y-4">
+            <div>
+                <h3 class="text-base font-extrabold text-black">Confirm Deletion</h3>
+                <p class="text-xs font-medium text-gray-600 mt-2">Are you sure you want to delete this account?</p>
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeDeleteConfirmation(false)" class="flex-1 py-2.5 bg-gray-200 hover:bg-gray-300 text-black text-xs font-bold rounded-lg transition">Cancel</button>
+                <button onclick="closeDeleteConfirmation(true)" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="hiddenQrContainer" style="display:none;"></div>
+
+    <script>
+        let state = {
+            shopName: localStorage.getItem('shopName') || 'Splitpay',
+            upiAccounts: JSON.parse(localStorage.getItem('upiAccounts')) || [],
+            history: JSON.parse(localStorage.getItem('history')) || [],
+            addedAmounts: [],
+            currentActiveTransaction: null,
+            selectedHistoryIndex: null,
+            pendingDeleteId: null
+        };
+        let editingUpiId = null;
+        let currentQrSlideIndex = 0;
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('navShopNameinnerText')?.setAttribute('innerText', state.shopName);
+            document.getElementById('navShopName').innerText = state.shopName;
+            document.getElementById('settingShopName').value = state.shopName;
+            showTab('generateTab');
+            renderUpiList();
+            renderHistoryL
