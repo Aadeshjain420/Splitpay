@@ -29,11 +29,23 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Create www folder and copy assets
+        run: |
+          mkdir -p www
+          cp index.html www/
+
+      - name: Add Internet Permission
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            sed -i '/<application/i \    <uses-permission android:name="android.permission.INTERNET" />' "$MANIFEST"
+          fi
+
       - name: Initialize Capacitor Android
-        run: npx cap add android
+        run: npx --yes @capacitor/cli add android
 
       - name: Sync Web Assets
-        run: npx cap sync android
+        run: npx --yes @capacitor/cli sync android
 
       - name: Build APK with Gradle
         run: |
