@@ -34,6 +34,13 @@ jobs:
           mkdir -p www
           cp index.html www/
 
+      - name: Add Internet Permission
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            sed -i '/<application/i \    <uses-permission android:name="android.permission.INTERNET" />' "$MANIFEST"
+          fi
+
       - name: Initialize Capacitor Android
         run: npx --yes @capacitor/cli add android
 
